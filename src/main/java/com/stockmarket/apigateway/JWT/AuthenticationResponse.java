@@ -2,9 +2,13 @@ package com.stockmarket.apigateway.JWT;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Getter
-@AllArgsConstructor
+@Getter @Setter
+@NoArgsConstructor
 public class AuthenticationResponse {
-    private final String jwt;
+    private String username;
+    private Boolean admin;
+    private String jwt;
 }

@@ -27,4 +27,12 @@ public class UserService implements UserDetailsService {
         }
         throw new UsernameNotFoundException(null);
     }
+
+    public Boolean getRoleByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isPresent()) {
+            return optionalUser.get().isAdmin();
+        }
+        return null;
+    }
 }

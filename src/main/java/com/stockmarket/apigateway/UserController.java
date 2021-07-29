@@ -8,10 +8,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -26,9 +26,11 @@ public class UserController {
         this.jwtUtil = jwtUtil;
     }
 
-    @RequestMapping("/home")
-    public String home(){
-        return "Hello World";
+    @GetMapping("/home")
+    public ResponseEntity<?> home(){
+        Map<String, String> res = new HashMap<>();
+        res.put("status","Successful");
+        return ResponseEntity.ok(res);
     }
 
     @PostMapping("/authenticate")
@@ -44,6 +46,10 @@ public class UserController {
         final UserDetails userDetails = userDetailService.loadUserByUsername(authenticationRequest.getUsername());
         final String JWT = jwtUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(new AuthenticationResponse(JWT));
+        AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+        authenticationResponse.setJwt(JWT);
+        authenticationResponse.setUsername(userDetails.getUsername());
+        authenticationResponse.setAdmin(userDetailService.getRoleByUsername(userDetails.getUsername()));
+        return ResponseEntity.ok(authenticationResponse);
     }
 }

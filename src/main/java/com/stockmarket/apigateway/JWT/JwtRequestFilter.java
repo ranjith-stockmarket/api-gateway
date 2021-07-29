@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter{
 
@@ -31,8 +30,11 @@ public class JwtRequestFilter extends OncePerRequestFilter{
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String authorizationHeader = httpServletRequest.getHeader("Authorization");
-
+        final String authorizationHeader = httpServletRequest.getHeader("authorization");
+        System.out.println("---x----");
+        System.out.println(httpServletRequest.getRequestURL());
+        System.out.println(authorizationHeader);
+        System.out.println("---x----");
         String username = null;
         String JWT = null;
 

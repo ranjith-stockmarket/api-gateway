@@ -13,6 +13,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -42,41 +45,29 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//        http.csrf().disable()
-//                .authorizeRequests()
-//                .antMatchers("/api/access","/api/login","/api/image/get/*","/api/user/setPassword","/api/user/forgotPassword/*").permitAll()
-//                .antMatchers("/api/admin-user/**","/api/admin-warehouse/**").hasRole("ADMIN")
-//                .antMatchers("/api/user/**").hasRole("USER")
-//                .antMatchers("/api/warehouse/**", "/api/warehouse-hub/**",
-//                        "/api/procurement/**","/api/product/productGroup/abstract/all").hasAnyRole("WAREHOUSE", "ADMIN")
-//                .antMatchers("/api/hub/**","/api/product/productGroup/abstract/master/all").hasAnyRole("HUB", "ADMIN")
-//                .antMatchers("/api/product/**", "/api/image/add").hasAnyRole("PRODUCT", "ADMIN")
-//                .antMatchers("/api/customer/**").hasAnyRole("CUSTOMER","ADMIN")
-//                .anyRequest().authenticated()
-//                .and()
-//                .formLogin()
-//                .loginPage("/api/access").permitAll()
-//                .loginProcessingUrl("/api/login").permitAll()
-//                .successForwardUrl("/api/login/success")
-//                .failureForwardUrl("/api/login/fail").permitAll()
-//                .and()
-//                .logout()
-//                .invalidateHttpSession(true)
-//                .clearAuthentication(true)
-//                .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout"))
-//                .logoutSuccessUrl("/api/logout/success").permitAll();
-//    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests().antMatchers("/api/authenticate").permitAll()
+        http.cors().and().csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/api/authenticate").permitAll()
+                //.antMatchers("/api/company").hasAnyRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOriginPattern("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
     }
 }
